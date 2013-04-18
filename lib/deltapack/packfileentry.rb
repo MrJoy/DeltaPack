@@ -7,7 +7,7 @@ module DeltaPack
       else
         # TODO: Dynamically determine which encoder to use...
         basis = previous_entry.filename
-        (contents, encoder) = [:xdelta, :edelta, :bsdiff, :zdelta].map do |kind|
+        (contents, encoder) = [:xdelta, :edelta, :bsdiff].map do |kind|
           enc = DeltaPack::Encoder.find_by_kind(kind)
           [enc.encode(basis, src_filename), enc]
         end.sort do |a,b|
