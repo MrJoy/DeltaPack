@@ -4,7 +4,7 @@ DIR=${DIR%/}
 TMPDIR=${DIR}
 if [ -d "$DIR" ]; then
   pushd "$DIR" > /dev/null 2>&1
-  ls -rS | fgrep -v infiles.txt > infiles.txt
+  ls | fgrep -v infiles.txt | sort -n > infiles.txt
   mkdir "$TMPDIR"
   cat infiles.txt | while read FNAME; do
     BASIS=$(grep -E -B 1 "^$FNAME\$" infiles.txt | grep -v $FNAME)
