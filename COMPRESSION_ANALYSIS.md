@@ -36,8 +36,7 @@ The `ServiceMonth`s are:
 
 Look into the following:
 
-* xdelta3 (HomeBrew 'xdelta')
-* vcdiff (HomeBrew 'open-vcdiff')
+* vcdiff (HomeBrew 'open-vcdiff'; same algorithm as XDelta, but may produce different results?)
 * gdiff (gem)
 
 
