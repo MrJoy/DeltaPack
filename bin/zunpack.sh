@@ -22,7 +22,7 @@ tar xjf "$PACKAGE"
 
     if [ -e "$DIFF" ]; then
       echo "Rebuilding $TARGET via $BASIS and $DIFF..."
-      zdu $BASIS $TARGET $DIFF && rm $DIFF
+      zdu $BASIS $DIFF $TARGET && rm $DIFF
     else
       echo "Looks like we're done here."
       exit 0
