@@ -4,9 +4,9 @@ require File.expand_path(File.join(File.dirname(__FILE__), 'lib', 'deltapack'))
 
 allowed_methods = ARGV.map(&:to_sym)
 
-%w(156683 156684 172954 186941 238416).each do |dir|
-  DeltaPack::PackFile.new("#{dir}.dpack", :w, allowed_methods) do
-    Dir.glob("samples/#{dir}/*.json").sort.each do |fname|
+Dir.glob('samples/*').sort.each do |dir|
+  DeltaPack::PackFile.new("#{File.basename(dir)}.dpack", :w, allowed_methods) do
+    Dir.glob("#{dir}/*.json").sort.each do |fname|
       append_file fname
     end
   end
