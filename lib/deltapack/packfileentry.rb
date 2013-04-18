@@ -3,16 +3,19 @@ module DeltaPack
     def self.encode(previous_entry, src_filename)
       if(previous_entry == nil)
         encoder = DeltaPack::Encoder.find_by_kind(:literal)
-        basis = nil
+        contents = encoder.encode(nil, src_filename)
       else
         # TODO: Dynamically determine which encoder to use...
-        encoder = DeltaPack::Encoder.find_by_kind(:literal)
         basis = previous_entry.filename
+        (contents, encoder) = [:xdelta, :edelta, :bsdiff, :zdelta].map do |kind|
+          enc = DeltaPack::Encoder.find_by_kind(kind)
+          [enc.encode(basis, src_filename), enc]
+        end.sort do |a,b|
+          a[0].length <=> b[0].length
+        end.first
       end
-      filename = File.basename(src_filename)
-      contents = encoder.encode(basis, src_filename)
 
-      return PackFileEntry.new(encoder, filename, contents)
+      return PackFileEntry.new(encoder, src_filename, contents)
     end
 
     def self.decode(previous_entry, dst_filename, token, delta)

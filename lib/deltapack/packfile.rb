@@ -24,17 +24,18 @@ module DeltaPack
     attr_accessor :last_entry
 
     def append_file(fname)
-      entry = DeltaPack::PackFileEntry.encode(last_entry, fname)
+      entry = DeltaPack::PackFileEntry.encode(@last_entry, fname)
+      fname = File.basename(entry.filename)
 
-      puts "Adding #{entry.filename}, using method: #{entry.encoder.kind} (#{entry.contents.length} bytes)"
+      puts "Adding #{fname}, using method: #{entry.encoder.kind} (#{entry.contents.length} bytes)"
       fh.write([
         entry.encoder.token,
-        entry.filename.length,
-        entry.filename,
+        fname.length,
+        fname,
         entry.contents.length,
         entry.contents
       ].pack('ACA*L>A*'))
-      last_entry = entry
+      @last_entry = entry
     end
 
     def read_file
@@ -44,9 +45,8 @@ module DeltaPack
         filename = fh.read(name_length)
         content_length = fh.read(4).unpack("L>").first
         contents = fh.read(content_length)
-        entry = DeltaPack::PackFileEntry.decode(last_entry, filename, token, contents)
-
-        puts "Got: '#{filename}', encoded with method: #{entry.encoder.kind} (#{content_length} bytes)"
+        entry = DeltaPack::PackFileEntry.decode(@last_entry, filename, token, contents)
+        @last_entry = entry
         return entry
       rescue
         return false
