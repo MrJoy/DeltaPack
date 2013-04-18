@@ -99,9 +99,9 @@ time for i in */; do ../bin/zpack.sh $i; mv ${i%/}.tar.bz2 zdiff_${i%/}.tar.bz2;
 time for i in */; do ../bin/xpack.sh $i; mv ${i%/}.tar.bz2 xdiff_${i%/}.tar.bz2; done
 ```
 
-    real  0m18.589s
-    user  0m13.273s
-    sys   0m6.815s
+    real  0m47.207s
+    user  0m14.217s
+    sys   0m32.215s
 
 
 ## Size Results
