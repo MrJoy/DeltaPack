@@ -54,8 +54,8 @@ module DeltaPack
         entry = DeltaPack::PackFileEntry.decode(@last_entry, filename, token, contents)
         @last_entry = entry
         return entry
-      rescue
-        return false
+      # rescue
+      #   return false
       end
     end
   end
