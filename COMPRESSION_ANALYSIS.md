@@ -167,6 +167,17 @@ loss.
 * 238416:      14130 (115.0:1)
 * Total:     5250163 ( 62.9:1)
 
+### XDelta (xdelta3 + tar + bzip2)
+
+* 156683:      95982 (275.3:1)
+* 156684:    1398207 ( 96.0:1)
+* 172954:    1226329 (107.0:1)
+* 186941:     357875 (102.2:1)
+* 238416:      13279 (122.3:1)
+* Total:     3091672 (106.8:1)
+
+
+
 ## Initial Conclusions Regarding Size and Speed
 
 BSDiff clearly provides the best compression ratio, but comes at a roughly 50%
@@ -182,6 +193,11 @@ test run before betting on such an approach, lest it have pathological cases
 that produce even worse compression ratios.  Even if it doesn't, the short-term
 cost of extra CPU time vs. the long-term cost of archival storage may make it
 worth simply using BSDiff.
+
+XDelta presents an interesting situation, as it seemingly does much better on
+some types of data, produces results competitive with BSDiff, and offers
+vitually no performance penalty versus a plain tarball.  More investigation
+seems warranted.
 
 
 ## WTF Is Up With Service Month 156684?
@@ -240,7 +256,6 @@ ls -la *.bspatch.tbz2
 
 A net reduction of 23943 bytes, or 44% for that slice of data.
 
-
 ### Diffing 'Around' The Failure with ZDelta
 
 ```bash
@@ -267,6 +282,32 @@ ls -la *.zpatch.tbz2
 Notably, ZDelta does not like diffing from sample 1 to sample 3 for some
 reason, so the net win here is pretty negligible.
 
+### Diffing 'Around' The Failure with XDelta
+
+
+```bash
+xdelta3 encode -s 27048945.json 27053066.json a.xpatch
+xdelta3 encode -s 27053066.json 27058699.json b.xpatch
+xdelta3 encode -s 27048945.json 27058699.json c.xpatch
+ls -la *.xpatch
+```
+
+    -rw-r--r--  1 jfrisby  staff    853 Apr 18 02:13 a.xpatch
+    -rw-r--r--  1 jfrisby  staff  32422 Apr 18 02:13 b.xpatch
+    -rw-r--r--  1 jfrisby  staff   2539 Apr 18 02:13 c.xpatch
+
+```bash
+tar cjf a.xpatch.tbz2 27048945.json a.xpatch b.xpatch
+tar cjf b.xpatch.tbz2 27048945.json c.xpatch 27053066.json
+ls -la *.xpatch.tbz2
+```
+
+    -rw-r--r--  1 jfrisby  staff  57407 Apr 18 02:13 a.xpatch.tbz2
+    -rw-r--r--  1 jfrisby  staff  30227 Apr 18 02:13 b.xpatch.tbz2
+
+XDelta does very poorly 'recovering' from the hiccup, unlike BSDiff, but does
+a respectable job when circumventing it.
+
 
 ## Initial Conclusions On Outlier Elements
 
@@ -277,14 +318,15 @@ approaches.  Another option might be to identify outliers in terms of a moving
 average and stddev, and create a separate 'channel' for them when performing
 delta compression.
 
-Also, given the observation that programmatic-access data is *exactly*
-identical, except for metadata, it may be worth splitting data and metadata
-channels out before performing delta compression, then compressing each as
-a separate stream.  Perhaps even going as far as to identify and maintain a
-duplication table -- although that may be overkill as it seems likely that
-exact duplication will occur in temporal order and the diffs should handle it
-just fine.  Alternatively, ordering data streams by MD5 may be an elegant way
-to resolve this issue gracefully.
+Also, given the observation that the programmatic-access data is *exactly*
+identical, except for metadata -- and this will be a common scenario in
+practice most likely, it may be worth splitting data and metadata channels out
+before performing delta compression, then compressing each as a separate
+stream.  Perhaps even going as far as to identify and maintain a duplication
+table -- although that may be overkill as it seems likely that exact
+duplication will occur in temporal order and the diffs should handle it just
+fine.  Alternatively, ordering data streams by MD5 may be an elegant way to
+resolve this issue gracefully.
 
 ## A Quick Experiment With Size Ordering
 
