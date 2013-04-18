@@ -4,7 +4,13 @@ module DeltaPack
       raise "Mode must be one of :r, or :w." unless [:r, :w].include?(mode)
       raise "No such file #{fname}" if(mode == :r && !File.exists?(fname))
 
-      File.open(fname, mode.to_s) do |fh|
+      if(mode == :w)
+        fmode = "wb"
+      else
+        fmode = "rb"
+      end
+
+      File.open(fname, fmode) do |fh|
         self.fh = fh
         if(mode == :w)
           fh.write("DPAK")
