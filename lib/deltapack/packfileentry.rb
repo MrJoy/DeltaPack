@@ -1,13 +1,13 @@
 module DeltaPack
   class PackFileEntry
-    def self.encode(previous_entry, src_filename)
+    def self.encode(previous_entry, src_filename, allowed_methods)
       if(previous_entry == nil)
         encoder = DeltaPack::Encoder.find_by_kind(:literal)
         contents = encoder.encode(nil, src_filename)
       else
         # TODO: Dynamically determine which encoder to use...
         basis = previous_entry.filename
-        (contents, encoder) = [:xdelta, :edelta, :bsdiff].map do |kind|
+        (contents, encoder) = allowed_methods.map do |kind|
           enc = DeltaPack::Encoder.find_by_kind(kind)
           [enc.encode(basis, src_filename), enc]
         end.sort do |a,b|
