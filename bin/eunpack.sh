@@ -22,7 +22,7 @@ tar xjf "$PACKAGE"
 
     if [ -e "$DIFF" ]; then
       echo "Rebuilding $TARGET via $BASIS and $DIFF..."
-      edelta -q patch $BASIS $TARGET $PATCH && rm $DIFF
+      edelta -q patch $BASIS $TARGET $DIFF && rm $DIFF
     else
       echo "Looks like we're done here."
       exit 0
