@@ -16,6 +16,6 @@ module DeltaPack
   def self.copyright; @copyright ||= "Copyright (C) 2013 Jonathon Frisby"; end
 end
 
-require 'deltapack/encoding'
+require 'deltapack/encoder'
 require 'deltapack/packfileentry'
 require 'deltapack/packfile'
