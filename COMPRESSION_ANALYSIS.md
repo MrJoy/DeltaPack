@@ -102,6 +102,16 @@ time for i in */; do ../bin/xpack.sh $i; mv ${i%/}.tar.bz2 xdiff_${i%/}.tar.bz2;
     user  0m14.217s
     sys   0m32.215s
 
+### EDelta (edelta + tar + bzip2)
+
+```bash
+time for i in */; do ../bin/epack.sh $i; mv ${i%/}.tar.bz2 ediff_${i%/}.tar.bz2; done
+```
+
+    real  0m16.363s
+    user  0m10.916s
+    sys   0m6.746s
+
 
 ## Size Results
 
@@ -175,6 +185,14 @@ loss.
 * 238416:      13271 (122.4:1)
 * Total:     2076607 (158.9:1)
 
+### EDelta (edelta + tar + bzip2)
+
+* 156683:     250728 (105.4:1)
+* 156684:    1823923 ( 73.6:1)
+* 172954:     971447 (135.0:1)
+* 186941:     333186 (109.8:1)
+* 238416:      13731 (118.3:1)
+* Total:     3393015 ( 97.3:0)
 
 ## Initial Conclusions Regarding Size and Speed
 
@@ -195,6 +213,12 @@ worth simply using BSDiff.
 XDelta seems to be the king of the hill here, with a comparatively small
 penalty over a baseline tarball but considerably better compression than
 BSDiff.
+
+EDelta, while being the fastest of the bunch, and in certain one-off tests
+producing better compression between certain file-pairs than BSDiff, fares
+poorly in terms of overall compression ratio -- but still comes out notably
+better overall than ZDelta.  Interestingly, ZDelta does outcompress it in the
+case of SM#186941 though.
 
 
 ## WTF Is Up With Service Month 156684?
@@ -305,6 +329,30 @@ ls -la *.xpatch.tbz2
 XDelta does very poorly 'recovering' from the hiccup, unlike BSDiff, but does
 a respectable job when circumventing it.
 
+### Diffing 'Around' The Failure with EDelta
+
+```bash
+edelta -q delta 27048945.json 27053066.json a.epatch
+edelta -q delta 27053066.json 27058699.json b.epatch
+edelta -q delta 27048945.json 27058699.json c.epatch
+ls -la *.epatch
+```
+
+    -rw-r--r--  1 jfrisby  staff    753 Apr 18 02:43 a.epatch
+    -rw-r--r--  1 jfrisby  staff  25575 Apr 18 02:43 b.epatch
+    -rw-r--r--  1 jfrisby  staff   1812 Apr 18 02:43 c.epatch
+
+```bash
+tar cjf a.epatch.tbz2 27048945.json a.epatch b.epatch
+tar cjf b.epatch.tbz2 27048945.json c.epatch 27053066.json
+ls -la *.epatch.tbz2
+```
+
+    -rw-r--r--  1 jfrisby  staff  56078 Apr 18 02:43 a.epatch.tbz2
+    -rw-r--r--  1 jfrisby  staff  30207 Apr 18 02:43 b.epatch.tbz2
+
+EDelta shows similar characteristics to BSDiff here.
+
 
 ## Initial Conclusions On Outlier Elements
 
@@ -354,6 +402,14 @@ resolve this issue gracefully.
 * 238416:      13279 (122.3:1)
 * Total:     3091672 (106.8:1)
 
+### EDelta (edelta + tar + bzip2)
+
+* 156683:     127883 (206.6:1)
+* 156684:    1962229 ( 68.4:1)
+* 172954:    1719066 ( 76.3:1)
+* 186941:     547353 ( 66.8:1)
+* 238416:      13815 (117.6:1)
+* Total:     4370346 ( 75.5:1)
 
 ## Initial Conclusions About Size Ordering
 
@@ -367,3 +423,5 @@ all.
 
 XDelta on the other hand, lost out in a big way, despite gaining huge ground on
 SM#156683.
+
+EDelta -- not even worth discussing.
