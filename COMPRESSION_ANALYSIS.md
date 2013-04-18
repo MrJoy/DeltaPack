@@ -169,18 +169,17 @@ loss.
 
 ### XDelta (xdelta3 + tar + bzip2)
 
-* 156683:      95982 (275.3:1)
-* 156684:    1398207 ( 96.0:1)
-* 172954:    1226329 (107.0:1)
-* 186941:     357875 (102.2:1)
-* 238416:      13279 (122.3:1)
-* Total:     3091672 (106.8:1)
-
+* 156683:     155644 (169.8:1)
+* 156684:     984625 (136.3:1)
+* 172954:     710515 (184.6:1)
+* 186941:     212552 (172.1:1)
+* 238416:      13271 (122.4:1)
+* Total:     2076607 (158.9:1)
 
 
 ## Initial Conclusions Regarding Size and Speed
 
-BSDiff clearly provides the best compression ratio, but comes at a roughly 50%
+BSDiff clearly provides the good compression ratio, but comes at a roughly 50%
 penalty in total wall-clock time.  It remains to be seen how that ratio holds
 when using network-attached, or even locally-attached spinning disks instead of
 an SSD but the clear result is that you're paying a fair amount for the extra
@@ -194,10 +193,9 @@ that produce even worse compression ratios.  Even if it doesn't, the short-term
 cost of extra CPU time vs. the long-term cost of archival storage may make it
 worth simply using BSDiff.
 
-XDelta presents an interesting situation, as it seemingly does much better on
-some types of data, produces results competitive with BSDiff, and offers
-vitually no performance penalty versus a plain tarball.  More investigation
-seems warranted.
+XDelta seems to be the king of the hill here, with a comparatively small
+penalty over a baseline tarball but considerably better compression than
+BSDiff.
 
 
 ## WTF Is Up With Service Month 156684?
@@ -348,6 +346,16 @@ resolve this issue gracefully.
 * 238416:      14147 (114.8:1)
 * Total:     3004950 (109.8:1)
 
+### XDelta (xdelta3 + tar + bzip2)
+
+* 156683:      95982 (275.3:1)
+* 156684:    1398207 ( 96.0:1)
+* 172954:    1226329 (107.0:1)
+* 186941:     357875 (102.2:1)
+* 238416:      13279 (122.3:1)
+* Total:     3091672 (106.8:1)
+
+
 ## Initial Conclusions About Size Ordering
 
 While this shored up the worst-case for BSDiff quite a bit, BSDiff overall
@@ -357,3 +365,6 @@ investigating how the differing sort orders generalize.
 On the other hand, ZDelta made enormous strides here (127.1:1 vs. 62.9:1) --
 enough that it may be worth looking at it as an alternative to BSDiff after
 all.
+
+XDelta on the other hand, lost out in a big way, despite gaining huge ground on
+SM#156683.
