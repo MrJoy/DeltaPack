@@ -6,9 +6,13 @@ GEM
     popen4 (0.1.2)
       Platform (>= 0.4.0)
       open4 (>= 0.4.0)
+    rake (10.0.4)
+    slop (3.4.4)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
   popen4
+  rake
+  slop

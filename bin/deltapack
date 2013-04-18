@@ -1,0 +1,75 @@
+#!/usr/bin/env ruby
+
+require File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib', 'deltapack'))
+require 'slop'
+
+COMMON_OPTIONS = proc do |ctx|
+  ctx.instance_eval do
+    on :v, :version, 'Print the version.' do puts "DeltaPack, v.#{DeltaPack.version}.  #{DeltaPack.copyright}"; end
+    on :'?', :'help', 'Show this help screen.' do puts self; end
+  end
+end
+
+opts = Slop.parse(strict: true) do
+  banner [
+    'Usage: command [options]',
+    [
+      '',
+      'This utility will pack a set of files in a directory using a variety of delta',
+      'compression techniques.  It will not retain ownership information,',
+      'permissions, ACLs, extended attributes nor will it act recursively.  It is',
+      'meant to be used on a flat directory of files that are very similar to',
+      'one-another.  For example, sequential snapshots of a web site over time.',
+    ].join("\n  "),
+    ''
+  ].join("\n")
+
+  command :compress do
+    banner 'Usage: compress [options] --packfile outfile.dpack --dir source_dir/'
+    COMMON_OPTIONS.call(self)
+
+    on :'p=', :'packfile=', 'The delta archive to create. (Required)', as: String, argument: :required
+    on :'d=', :'dir=', 'The directory to be compressed. (Required)', as: String, argument: :required
+    on :'s=', :'sort=', [
+      'How to order files (default=string).  One of:',
+      'string: Sort by filename, in lexicographical order.',
+      'number: Sort by filename, in numeric order.',
+      # TODO: Implement the following:
+      # 'ctime:  Sort by file creation time.',
+      # 'mtime:  Sort by file modification time.',
+    ].join("\n\t"), as: Symbol
+    #on :'m=', :'methods=', 'The delta methods to employ.', as: Array, delimiter: ','
+
+    run do |opts, args|
+      puts "You ran 'compress' with options #{opts.to_hash} and args: #{args.inspect}"
+    end
+  end
+
+  command :decompress do
+    banner 'Usage: decompress [options] --packfile infile.dpack --dir dest_dir/'
+    COMMON_OPTIONS.call(self)
+
+    on :'p=', :'packfile=', 'The delta archive to extract. (Required)', as: String, argument: :required
+    on :'d=', :'dir=', 'The directory in which to place extracted files. (Required)', as: String, argument: :required
+
+    run do |opts, args|
+      puts "You ran 'decompress' with options #{opts.to_hash} and args: #{args.inspect}"
+    end
+  end
+
+  COMMON_OPTIONS.call(self)
+
+  # on :a, :age=, 'Your age', as: Integer
+  # on 'name=', 'Your name'
+  # on 'p', 'password', 'An optional password', argument: :optional
+  # on :list=, as: Array, delimiter: ':', limit: 2
+
+  # command 'add' do
+  #   on :v, :verbose, 'Enable verbose mode'
+  #   on :name, 'Your name'
+
+  #   run do |opts, args|
+  #     puts "You ran 'add' with options #{opts.to_hash} and args: #{args.inspect}"
+  #   end
+  # end
+end
