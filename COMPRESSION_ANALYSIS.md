@@ -32,6 +32,14 @@ The `ServiceMonth`s are:
   * 4 samples.
   * All absolutely identical except for timestamps and bill IDs.
 
+## TODO
+
+Look into the following:
+
+* xdelta3 (HomeBrew 'xdelta')
+* vcdiff (HomeBrew 'open-vcdiff')
+* gdiff (gem)
+
 
 ## Time Results
 
@@ -84,6 +92,17 @@ time for i in */; do ../bin/zpack.sh $i; mv ${i%/}.tar.bz2 zdiff_${i%/}.tar.bz2;
     real  0m18.589s
     user  0m13.273s
     sys   0m6.815s
+
+### XDelta (xdelta3 + tar + bzip2)
+
+```bash
+time for i in */; do ../bin/xpack.sh $i; mv ${i%/}.tar.bz2 xdiff_${i%/}.tar.bz2; done
+```
+
+    real  0m18.589s
+    user  0m13.273s
+    sys   0m6.815s
+
 
 ## Size Results
 
@@ -147,7 +166,6 @@ loss.
 * 186941:     221445 (165.2:1)
 * 238416:      14130 (115.0:1)
 * Total:     5250163 ( 62.9:1)
-
 
 ## Initial Conclusions Regarding Size and Speed
 
@@ -270,3 +288,30 @@ to resolve this issue gracefully.
 
 ## A Quick Experiment With Size Ordering
 
+### BSDiff (bsdiff + tar + bzip2)
+
+* 156683:     136406 (193.7:1)
+* 156684:    1251915 (107.2:1)
+* 172954:    1092412 (120.1:1)
+* 186941:     313983 (116.5:1)
+* 238416:      13740 (118.2:1)
+* Total:     2808456 (117.5:1)
+
+### ZDelta (zdc + tar + bzip2)
+
+* 156683:     116583 (226.7:1)
+* 156684:    1333179 (100.7:1)
+* 172954:    1194498 (109.8:1)
+* 186941:     346543 (105.5:1)
+* 238416:      14147 (114.8:1)
+* Total:     3004950 (109.8:1)
+
+## Initial Conclusions About Size Ordering
+
+While this shored up the worst-case for BSDiff quite a bit, BSDiff overall
+seems to have come out behind (117.5:1 vs. 127.1:1) -- although it may be worth
+investigating how the differing sort orders generalize.
+
+On the other hand, ZDelta made enormous strides here (127.1:1 vs. 62.9:1) --
+enough that it may be worth looking at it as an alternative to BSDiff after
+all.
