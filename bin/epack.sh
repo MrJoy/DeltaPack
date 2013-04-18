@@ -10,7 +10,7 @@ if [ -d "$DIR" ]; then
     BASIS=$(grep -E -B 1 "^$FNAME\$" infiles.txt | grep -v $FNAME)
     if [ "$BASIS" != "" ]; then
       echo "Creating diff between $BASIS and $FNAME..."
-      edelta delta $BASIS $FNAME "$TMPDIR/${BASIS}_${FNAME}.epatch"
+      edelta -q delta $BASIS $FNAME "$TMPDIR/${BASIS}_${FNAME}.epatch"
     else
       export STARTING_POINT=$FNAME
     fi
