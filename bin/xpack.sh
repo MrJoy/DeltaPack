@@ -10,7 +10,7 @@ if [ -d "$DIR" ]; then
     BASIS=$(grep -E -B 1 "^$FNAME\$" infiles.txt | grep -v $FNAME)
     if [ "$BASIS" != "" ]; then
       echo "Creating diff between $BASIS and $FNAME..."
-      xdelta3 encode -s $BASIS $FNAME "$TMPDIR/${BASIS}_${FNAME}.xpatch"
+      xdelta3 encode -9 -I 0 -s $BASIS $FNAME "$TMPDIR/${BASIS}_${FNAME}.xpatch"
     else
       export STARTING_POINT=$FNAME
     fi
